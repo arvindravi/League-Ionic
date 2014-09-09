@@ -1,0 +1,14 @@
+/* Empty. Add your own CSS if you like */
+.righty {
+	float: right;
+}
+
+.lefty {
+	float: left;
+}
+
+pre {
+	font-family: 'Helvetica', sans-serif;
+	color: gray;
+	size: 8px;
+}

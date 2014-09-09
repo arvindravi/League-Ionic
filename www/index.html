@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title></title>
+
+    <link href="lib/ionic/css/ionic.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+    <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
+    <link href="css/ionic.app.css" rel="stylesheet">
+    -->
+
+    <!-- ionic/angularjs js -->
+    <script src="lib/ionic/js/ionic.bundle.js"></script>
+
+    <!-- cordova script (this will be a 404 during development) -->
+    <script src="cordova.js"></script>
+
+    <!-- your app's js -->
+    <script src="js/app.js"></script>
+  </head>
+  <body ng-app="lol">
+		
+	<ion-nav-bar class="bar-assertive">
+		<ion-nav-back-button class="button-icon ion-arrow-left-c">
+		</ion-nav-back-button>
+	</ion-nav-bar>
+	<ion-nav-view></ion-nav-view>
+	
+	<!-- Templates -->
+	
+	<!-- Tabs -->
+	<script id="tabs.html" type="text/ng-template">
+		  	<ion-tabs class="tabs-assertive tabs-icon-only">
+				<ion-tab title="Summoner" href="#/tab/summoner" icon-on="ion-ios7-person" icon-off="ion-ios7-person-outline">
+					<ion-nav-view name="summoner-tab"></ion-nav-view>
+				</ion-tab>
+				<ion-tab title="Champions" href="#/tab/champions" icon-on="ion-ios7-bolt" icon-off="ion-ios7-bolt-outline" ng-controller="ChampionsCtrl">
+					<ion-nav-view name="champions-tab"></ion-nav-view>
+				</ion-tab>
+				<ion-tab title="Items" href="#/tab/items" icon-on="ion-ios7-pricetag" icon-off="ion-ios7-pricetag-outline" ng-controller="ItemsCtrl">
+					<ion-nav-view name="items-tab"></ion-nav-view>
+				</ion-tab>
+			</ion-tabs>
+	</script>
+	
+	<!-- Summoner -->
+	<script id="summoner.html" type="text/ng-template">
+		<ion-view title="Summoner">
+			<ion-content>
+	  		  	<div class="card item item-wrap">
+	  		  		<form ng-submit="search(summoner)">
+	  			  		<div id="summonername-wrap">
+	  			  			<label class="item-input">
+	  			  				<input type="text" placeholder="Summoner Name" ng-model="summoner.name" />
+	  			  			</label>
+	  			  		</div>
+						<hr />
+	  					<div id="server-wrap">
+	  						<ion-radio ng-repeat="server in servers" ng-value="server" ng-model="summoner.region">
+	  							{{server}} 
+	  							<i class="radio-icon ion-checkmark"></i>
+	  						</ion-radio>
+	  					</div>
+	  					<div>
+	  						<button class="button button-block button-assertive" type="submit">
+	  						  Find Summoner
+	  						</button>
+	  					</div>
+	  		  		</form>
+	  		  	</div>
+			</ion-content>
+		</ion-view>
+	</script>
+	
+	<!-- Summoner Info -->
+	<script id="summonerInfo.html" type="text/ng-template">
+		<ion-view title="Summoner Info">
+			<ion-content>
+				<div class="list card">
+				  <div class="item item-avatar">
+				    <img src="{{baseProfileIconUrl}}{{summoner.profileIconId}}.png">
+				    <h2>{{summoner.name}}</h2>
+				    <p>Level {{summoner.summonerLevel}}</p>
+				  </div>
+				  <!-- Player Stats -->
+				  <div class="item item-body">
+					  <div id="stats" ng-repeat="stat in stats.playerStatSummaries">
+	  					  <div class="item item-divider">
+	  					  	{{gameType(stat.playerStatSummaryType)}}
+	  					  </div>
+	  					  <div class="item item-text-wrap">
+					  		  <p>
+					  		  	<b>Wins: </b> <span class="positive righty">{{stats.playerStatSummaries[$index].wins}}</span> <br />
+								<b>Total Assists: </b> <span class="positive righty">{{stats.playerStatSummaries[$index].aggregatedStats.totalAssists}}</span> <br />
+								<b>Total Champion Kills: </b> <span class="positive righty">{{stats.playerStatSummaries[$index].aggregatedStats.totalChampionKills}}</span> <br />
+								<b>Total Minion Kills: </b> <span class="positive righty">{{stats.playerStatSummaries[$index].aggregatedStats.totalMinionKills}}</span> <br />
+								<b>Total Neutral Minions Killed: </b> <span class="positive righty">{{stats.playerStatSummaries[$index].aggregatedStats.totalNeutralMinionsKilled}}</span> <br />
+								<b>Total Turrets Destroyed: </b> <span class="positive righty">{{stats.playerStatSummaries[$index].aggregatedStats.totalTurretsKilled}}</span> <br />
+					  		  </p>
+	  					  </div>
+					  </div>
+					  <br />
+				  </div>
+			</ion-content>
+		</ion-view>
+	</script>
+	
+	<!-- Champions -->
+	<script id="champions.html" type="text/ng-template">
+		<ion-view title="Champions">
+			<ion-content>
+				<div class="list">
+					<div class="item item-divider">
+						Free to Play
+					</div>
+					<a href="#/tab/champion/{{champion.id}}" class="item item-thumbnail-left" ng-repeat="champion in freeToPlayChampions">
+  					  <img ng-src="{{baseImgUrl}}{{champion.image.full}}" alt="{{champion.name}}" />
+  				      <h2>{{champion.name}}</h2>
+  				      <p>{{champion.title}}</p>
+					</a>
+					<div class="item item-divider">
+						Champions
+					</div>
+				    <div ng-repeat="champion in championPool">
+					    <a class="item item-thumbnail-left" href="#/tab/champion/{{champion.id}}">
+					      <!-- <div style="height:{{champion.image.h}}px;width:{{champion.image.w}}px; background: url({{baseImgUrl}}{{champion.image.sprite}}) -{{champion.image.x}}px -{{champion.image.y}}px no-repeat; float:left" data-rg-name="{{champion.image.group}}" data-rg-id="{{champion.name}}"></div> -->
+						  <img ng-src="{{baseImgUrl}}{{champion.image.full}}" alt="{{champion.name}}" />
+					      <h2>{{champion.name}}</h2>
+					      <p>{{champion.title}}</p>
+					    </a>
+				    </div>
+			</ion-content>
+		</ion-view>
+	</script>
+	
+	<!-- Champion Info -->
+	<script id="championInfo.html" type="text/ng-template">
+		<ion-view title="{{champion.name}}">
+			<ion-content>
+				<div class="list card">
+				  <div class="item">
+				    <div class="row">
+				    	<div class="col">
+						    <img src="{{baseImgUrl}}{{champion.image.full}}">
+				    	</div>
+				    	<div class="col">
+						    <h2>{{champion.name}}</h2>
+						    <p>{{champion.title}}</p>
+							<br />
+							<div ng-repeat="tag in champion.tags">
+								<p>{{tag}}</p>
+							</div>
+				    	</div>
+				    </div>
+				  </div>
+				  <br />
+				  <div class="item">
+				  	<div class="row responsive-sm">
+				  		<div class="col">
+							<!-- <div style="height:{{champion.image.h}}px;width:{{champion.image.w}}px; background: url({{baseImgUrl}}{{champion.image.sprite}}) -{{champion.image.x}}px -{{champion.image.y}}px no-repeat; float:left" data-rg-name="{{champion.image.group}}" data-rg-id="{{champion.name}}"></div> -->
+				  			<h3>{{champion.passive.name}}</h3>
+							<p>
+								<pre>
+									{{champion.passive.description}}
+								</pre>
+							</p>
+				  		</div>
+				  	</div>
+				  </div>
+				</div>
+			</ion-content>
+		</ion-view>
+	</script>
+	
+	<!-- Items -->
+	<script id="items.html" type="text/ng-template">
+		<ion-view title="Items">
+			<ion-content start-y="52">
+				<!-- <div id="search-box" class="bar bar-header item-input-inset">
+			        <div class="item-input-wrapper">
+			          <i class="icon ion-ios7-search placeholder-icon"></i>
+			          <input type="search" placeholder="Search" ng-model="data.searchQuery">
+			          <i class="clear-search icon ion-ios7-close-empty" ng-click="clearSearch()"></i>
+			        </div>
+			        <button class="button button-clear">
+			          Cancel
+			        </button>
+				</div> -->
+				<div class="list">
+					<a href="#/tab/item/{{item.id}}" class="item item-thumbnail-left" ng-repeat="item in items | filter:data.searchQuery">
+						<img ng-src="{{baseImgUrl}}{{item.image.full}}" alt="{{item.name}}" />
+						<h2>{{item.name}}</h2>
+						<p>{{item.plaintext}}</p>
+					</a>
+				</div>
+			</ion-content>
+		</ion-view>
+	</script>
+	
+	<!-- Item Info -->
+	<script id="itemInfo.html" type="text/ng-template">
+		<ion-view title="{{item.name}}">
+			<ion-content>
+				<div class="list card">
+				  <div class="item">
+				    <div class="row">
+				    	<div class="col">
+						    <img src="{{baseImgUrl}}{{item.image.full}}">
+				    	</div>
+				    	<div class="col">
+						    <h2>{{item.name}}</h2>
+						    <pre>{{item.plaintext}}</pre>
+							<br />
+							<div ng-repeat="tag in item.tags">
+								<p>{{tag}}</p>
+							</div>
+				    	</div>
+				    </div>
+					<div class="row">
+						<h3>Price:&nbsp;</h3> <p>{{item.gold.total}} Gold</p>
+					</div>
+				  </div>
+				  <br />
+				  <div class="item">
+				  	<div class="row responsive-sm">
+				  		<div class="col">
+							<!-- <div style="height:{{item.image.h}}px;width:{{item.image.w}}px; background: url({{baseImgUrl}}{{item.image.sprite}}) -{{item.image.x}}px -{{item.image.y}}px no-repeat; float:left" data-rg-name="{{item.image.group}}" data-rg-id="{{item.name}}"></div> -->
+				  			<h3>Stats</h3>
+							<p>
+								<pre>
+									{{item.description}}
+								</pre>
+							</p>
+				  		</div>
+				  	</div>
+				  </div>
+				</div>
+			</ion-content>
+		</ion-view>
+	</script>
+  </body>
+</html>
